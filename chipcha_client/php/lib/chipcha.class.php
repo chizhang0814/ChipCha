@@ -60,45 +60,36 @@ class chipchaResponse {
 	var $is_valid = false;
 	var $error;
 }
-class Chipcha
-{
+class Chipcha{
 	var $Address;
 	var $Server;
 	var $Port;
 	var $PrivateKey;
 	var $RequestURL;
 	
-	function Chipcha($RequestURL, $PrivateKey="")
-	{
-		if($PrivateKey == "" || $RequestURL == "")
-		{
+	function Chipcha($RequestURL, $PrivateKey=""){
+		if($PrivateKey == "" || $RequestURL == ""){
 			return "no initial";
 		}
 		$this->GetServerInfoByURL($RequestURL);
 		$this->PrivateKey = $PrivateKey;
 		$this->RequestURL = $this->GetVerifyShortURL($RequestURL);
 		$this->Connect();
-	
 	}
 	
-	function Connect()
-	{
+	function Connect(){
 		return $this->Server = fsockopen($this->Address, $this->Port, $ErrorNo, $ErrorString, 5);
 	}
 	
-	function Disconnect()
-	{
+	function Disconnect(){
 		fclose($this->Server);
 	}
 	
-	public function Verify($IP, $AuthCode, $Sid="")
-	{
-		if($IP == "")
-		{
+	public function Verify($IP, $AuthCode, $Sid=""){
+		if($IP == ""){
 			return "no ip";
 		}
-		if($AuthCode == "")
-		{
+		if($AuthCode == ""){
 			return "no input";
 		}
 	
@@ -108,68 +99,54 @@ class Chipcha
 		$Out = "POST ".$this->RequestURL." HTTP/1.1\r\nHost: ".$this->Address."\r\nUser-Agent: Hinside\r\nReferer: http://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"]."\r\nContent-Type: application/x-www-form-urlencoded;\r\nContent-Length: ".strlen($Content)."\r\nConnection: close\r\n\r\n".$Content;
 		fputs($this->Server, $Out);
 		$ReturnHeaders = "";
-		while($str = trim(fgets($this->Server, 1024)))
-		{
+		while($str = trim(fgets($this->Server, 1024))){
 			$ReturnHeaders .= $str."\r\n";
 		}
 		$ReturnBody = "";
-		while(!feof($this->Server))
-		{
+		while(!feof($this->Server)){
 			$ReturnBody .= fgets($this->Server, 1024);
 		}
 		$this->Disconnect();
 		return $ReturnBody;
 	}
 	
-	public function GetServerInfoByURL($URLString="")
-	{
-		if($URLString == "")
-		{
+	public function GetServerInfoByURL($URLString=""){
+		if($URLString == ""){
 			return -1;
 		}
 		
 		$URLArr = parse_url($URLString);
-		if(isset($URLArr['host']))
-		{
+		if(isset($URLArr['host'])){
 			$this->Address = $URLArr['host'];
 		}
-		else
-		{
+		else{
 			$this->Address = "127.0.0.1";
 		}
-		if(isset($URLArr['port']))
-		{
+		if(isset($URLArr['port'])){
 			$this->Port = $URLArr['port'];
 		}
-		else
-		{
+		else{
 			$this->Port = 80;
 		}
 	}
 	
-	public function GetVerifyShortURL($URLString="")
-	{
-		if($URLString == "")
-		{
+	public function GetVerifyShortURL($URLString=""){
+		if($URLString == ""){
 			return -1;
 		}
 		
 		$URLArr = parse_url($URLString);
 		$ShortURL = "";
-		if(isset($URLArr['path']))
-		{
+		if(isset($URLArr['path'])){
 			$ShortURL .= $URLArr['path'];
 		}
 		
-		if(isset($URLArr['query']))
-		{
+		if(isset($URLArr['query'])){
 			$ShortURL .= "?".$URLArr['query'];
 		}
-		if($ShortURL == "")
-		{
+		if($ShortURL == ""){
 			$ShortURL = "/";
-		}
-		
+		}		
 		return $ShortURL;
 	}
 }
